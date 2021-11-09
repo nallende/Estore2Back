@@ -1,58 +1,18 @@
 const express = require("express");
-const product = express();
-const cors = require("cors");
-const database = require("../Database");
+const router = express.Router();
 
-product.get("/getCategories", async (req, res) => {
-  let appData = {
-    isError: false,
-    data: [],
-  };
-  database.connection.getConnection((err, connection) => {
-    if (err) {
-      appData.isError = true;
-      appData.data = err;
-      res.status(500).json(appData);
-    } else {
-      await connection.query("Select * from categories", (error, rows) => {
-        if (error) {
-          appData.isError = true;
-          appData.data = err;
-          res.status(500).json(appData);
-        } else {
-          appData.data = rows;
-          res.status(200).json(appData);
-        }
-      });
-      connection.release();
-    }
-  });
+const { categories } = require("../models");
+
+router.get("/getCategories", async (req, res) => {
+  const appData = await categories.findAll();
+  res.json(appData);
 });
 
-product.get("/getProducts", async (req, res) => {
-  let appData = {
-    isError: false,
-    data: [],
-  };
-  database.connection.getConnection((err, connection) => {
-    if (err) {
-      appData.isError = true;
-      appData.data = err;
-      res.status(500).json(appData);
-    } else {
-      await connection.query("Select * from products", (error, rows) => {
-        if (error) {
-          appData.isError = true;
-          appData.data = err;
-          res.status(500).json(appData);
-        } else {
-          appData.data = rows;
-          res.status(200).json(appData);
-        }
-      });
-      connection.release();
-    }
-  });
+const { products } = require("../models");
+
+router.get("/getProducts", async (req, res) => {
+  const product = await products.findAll();
+  res.json(product);
 });
 
-module.exports = product;
+module.exports = router;

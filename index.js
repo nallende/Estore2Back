@@ -1,21 +1,10 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const helmet = require("helmet");
-
+require("dotenv").config();
+app.use(express.json());
 app.use(cors());
-
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method"
-//   );
-//   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-//   res.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
-//   next();
-// });
 
 app.use(helmet());
 
@@ -47,15 +36,22 @@ function ignoreFavicon(req, res, next) {
 
 app.use(ignoreFavicon);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-const product = require("./Routes/product");
-app.use("/product/api", product);
+const products = require("./Routes/product.js");
+app.use("/product/api", products);
 
 app.use("/", express.static("Uploads"));
 
 const PORT = 5000;
 
-const server = app.listen(process.env.PORT || PORT, () => {
-  console.log("Servidor activo en Puerto- " + PORT);
-});
+const db = require("./models");
+
+db.sequelize
+  .sync()
+  .then(() => {
+    const server = app.listen(process.env.PORT || PORT, () => {
+      console.log("Servidor activo en Puerto- " + PORT);
+    });
+  })
+  .catch((err) => {
+    console.log(`Error connecting : ${err.message}`);
+  });
