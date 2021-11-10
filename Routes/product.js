@@ -11,7 +11,7 @@ router.get("/getCategories", async (req, res) => {
 const { products } = require("../models");
 
 router.get("/getProducts", async (req, res) => {
-  const product = await products.findAll();
+  const product = await products.findByPk();
   res.json(product);
 });
 
